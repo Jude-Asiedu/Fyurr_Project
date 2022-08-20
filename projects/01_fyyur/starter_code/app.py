@@ -39,8 +39,9 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-
+    # seeking_talents,website,genre,seeking_description
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
+
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -53,8 +54,19 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    # seeking_venue = db.Column(db.String(120))
+    # seeking_description = db.Column(db.String(120))
+     # seeking_venue,seeking_description
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
+
+  # genre ,starting time
+
+# shows = db.Table('Shows',
+#     db.Column('artist_id', db.Integer,db.ForeignKey('Artist.id'),primary_key=True),
+#     db.Column('venue_id', db.Integer,db.ForeignKey('Venue.id'),primary_key=True),
+#     db.Column('start_time',db.String(20))
+# )
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
@@ -207,6 +219,9 @@ def show_venue(venue_id):
     "past_shows_count": 1,
     "upcoming_shows_count": 1,
   }
+  # dict_a = {}
+  # dict_b = []
+  # dict_a["past_shows"] = dict_b
   data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
   return render_template('pages/show_venue.html', venue=data)
 
@@ -243,6 +258,8 @@ def delete_venue(venue_id):
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
+  
+  # data = Artist.query.all()
   # TODO: replace with real data returned from querying the database
   data=[{
     "id": 4,
@@ -376,7 +393,7 @@ def edit_artist_submission(artist_id):
   # artist record with ID <artist_id> using the new attributes
 
   return redirect(url_for('show_artist', artist_id=artist_id))
-
+# ...
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
   form = VenueForm()
