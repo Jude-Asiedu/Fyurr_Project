@@ -308,8 +308,8 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-   #  TODO: Complete this endpoint for taking a venue_id, and using # SQLAlchemy ORM to delete a record.# 
-   #   Handle cases where the session commit could fail .
+  # TODO: Complete this endpoint for taking a venue_id, and using # SQLAlchemy ORM to delete a record.# 
+  # Handle cases where the session commit could fail .
 
   error = False
   try: 
