@@ -10,5 +10,6 @@ DEBUG = True
 
 
 # TODO IMPLEMENT DATABASE URL
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:root@localhost:5432/playground'
-
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres@localhost:5432/playground'
+# With pwd = 'postgresql://postgres:root@localhost:5432/playground'
+# with random key 'postgresql://postgres:${SECRET_KEY}root@localhost:5432/playground'
