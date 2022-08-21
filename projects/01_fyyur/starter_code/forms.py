@@ -193,7 +193,7 @@ class ArtistForm(Form):
     )
     phone = StringField(
         # TODO implement validation logic for phone 
-        'phone',validators=[DataRequire(),Regexp(regex=r"\d{3}[ ]{1}\d{3}[ ]{1}\d{4}+$",message="Format is 022 333 4444")]
+        'phone',validators=[DataRequired(),Regexp(regex=r"/^[0-9]+$")]
     )
     image_link = StringField(
         'image_link'
