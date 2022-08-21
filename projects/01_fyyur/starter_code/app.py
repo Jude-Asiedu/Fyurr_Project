@@ -165,17 +165,17 @@ def create_venue_submission():
   error = False
   body = {}
   try:
-    name  = request.form['name']
-    state  = request.form['state']
-    city  = request.form['city']
-    address  = request.form['address']
-    phone  = request.form['phone']
-    genres  = request.form['genres']
-    image_link  = request.form['image_link']
-    website_link = request.form['website_link']
-    facebook_link = request.form['facebook_link']
-    seeking_talent = reqest.form['seeking_talent']
-    seeking_desciption = request.form['seeking_description']
+    name  = request.get_json()['name']
+    state  = request.get_json()['state']
+    city  = request.get_json()['city']
+    address  = request.get_json()['address']
+    phone  = request.get_json()['phone']
+    genres  = request.get_json()['genres']
+    image_link  = request.get_json()['image_link']
+    website_link = request.get_json()['website_link']
+    facebook_link = request.get_json()['facebook_link']
+    seeking_talent = reqest.get_json()['seeking_talent']
+    seeking_desciption = request.get_json()['seeking_description']
 
     data = Venue(name=name)
 
