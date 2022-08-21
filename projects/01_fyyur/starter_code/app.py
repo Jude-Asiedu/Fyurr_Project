@@ -104,7 +104,7 @@ def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
 
-  data = Venue.query.group_by(city).all()
+  data = Venue.query.group_by(Venue.city).all()
   shows = query.count(Shows.query.filter(Venue.start_time >= format_datetime(datetime.today())))
   data['venues']['num_upcoming_shows'] = shows
   
