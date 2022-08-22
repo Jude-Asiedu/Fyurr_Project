@@ -15,6 +15,7 @@ from forms import *
 from flask_migrate import Migrate
 from datetime import datetime
 from models import *
+import sys
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -125,7 +126,7 @@ def search_venues():
 
   # show_number = shows.query.count(data.filter_by(venue_id))
   data['num_upcoming_shows'] = show_number
-  count = query.count(data)
+  count = len(data)
   response['data'] = data
   response['count'] = count
 
@@ -142,8 +143,8 @@ def show_venue(venue_id):
   upcoming_shows =  Venue.query.filter(shows.venue_id == venue_id,shows.start_time >= format_datetime(datetime.today())).all()
   data['past_shows'] = past_shows
   data['upcoming_shows'] = upcoming_shows
-  data['past_shows_count'] = query.count(past_shows)
-  data['upcoming_shows_count'] = query.count(upcoming_shows)
+  data['past_shows_count'] = len(past_shows)
+  data['upcoming_shows_count'] = len(upcoming_shows)
 
  
   # dict_a = {}
@@ -164,7 +165,6 @@ def create_venue_form():
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
-  request = VenueForm()
   error = False
   body = {}
   try:
@@ -177,7 +177,7 @@ def create_venue_submission():
     image_link  = request.get_json()['image_link']
     website_link = request.get_json()['website_link']
     facebook_link = request.get_json()['facebook_link']
-    seeking_talent = reqest.get_json()['seeking_talent']
+    seeking_talent = request.get_json()['seeking_talent']
     seeking_desciption = request.get_json()['seeking_description']
 
     data = Venue(name=name)
@@ -185,9 +185,9 @@ def create_venue_submission():
     db.session.add(data)
     db.session.commit()
 
-    body['name'] = Venu.name
+    body['name'] = Venue.name
 
-  except():
+  except:
     db.session.rollback()
     error= True
     print(sys.exc_info)
@@ -247,6 +247,7 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
+  response = {}
   # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".
@@ -256,7 +257,7 @@ def search_artists():
   show_number =  shows.query.count(Artist.query.filter(shows.start_time >= format_datetime(datetime.today())).all())
 
   data['num_upcoming_shows'] = show_number
-  count = query.count(data)
+  count = len(data)
   response['data'] = data
   response['count'] = count
 
@@ -280,8 +281,8 @@ def show_artist(artist_id):
   upcoming_shows =  Venue.query.filter(shows.artist_id == artist_id,shows.start_time >= format_datetime(datetime.today())).all()
   data['past_shows'] = past_shows
   data['upcoming_shows'] = upcoming_shows
-  data['past_shows_count'] = query.count(past_shows)
-  data['upcoming_shows_count'] = query.count(upcoming_shows)
+  data['past_shows_count'] = len(past_shows)
+  data['upcoming_shows_count'] = len(upcoming_shows)
 
   
   # data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
@@ -368,7 +369,7 @@ def edit_venue_submission(venue_id):
     website_link = request.get_json()['website_link']
     facebook_link = request.get_json()['facebook_link']
     seeking_talent = request.get_json()['seeking_talent']
-    seeking_desciption = request.get_json()['seeking_description']
+    seeking_description = request.get_json()['seeking_description']
 
     newData = Venue.query.get(venue_id)
     newData.name = name
@@ -382,7 +383,7 @@ def edit_venue_submission(venue_id):
     newData.facebook_link = facebook_link
     newData.image_link = image_link
     newData.website_link = website_link
-    newData.seeking_venue = seeking_venue
+    newData.seeking_talent = seeking_talent
     newData.seeking_description = seeking_description
 
     db.session.commit()
@@ -463,12 +464,17 @@ def create_artist_submission():
 def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
-  data = shows.query.all()
-  venueName  = Venue.query.filter(shows.venue_id == Venue.id)
-  artistName  = Artist.query.filter(shows.artist_id == Artist.id)
-  data['venue_name'] = venueName['name']
-  data['artist_name']= artistName['name']
-  data['artist_image_link']= artistName['image_link']
+  result = shows.query.join(Artist,Artist.id == shows.artist_id).join(Venue,Venue.id ==  shows.venue_id).with_entities(shows.venue_id,shows.artist_id, Venue.name.label('venue_name')  ,Artist.name.label('artist_name') , Artist.image_link.label('artist_image_link')).all()
+  data = []
+  for _ in result:
+    data.append(_.asdict())
+    
+  # print(data)
+  # venueName  = Venue.query.filter(shows.venue_id == Venue.id)
+  # artistName  = Artist.query.filter(shows.artist_id == Artist.id)
+  # data['venue_name'] = venueName['name']
+  # data['artist_name']= artistName['name']
+  # data['artist_image_link']= artistName['image_link']
 
 
   return render_template('pages/shows.html', shows=data)
@@ -490,7 +496,7 @@ def create_show_submission():
       venue_id = request.get_json()['venue_id']
       start_time = request.get_json()['start_time']
       
-      newData = Shows(artist_id = artist_id, venue_id = venue_id , start_time = start_time)
+      newData = shows(artist_id = artist_id, venue_id = venue_id , start_time = start_time)
       db.session.add(newData)
       db.session.commit()
       body['start_time'] = newData.start_time
