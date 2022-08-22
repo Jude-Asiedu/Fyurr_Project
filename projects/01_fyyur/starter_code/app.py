@@ -107,10 +107,17 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  # data = []
+  # data = Venue.query.group_by(Venue.city).all()\
+  # data = Venue.query.filter(Venue.city)
 
-  data = Venue.query.group_by(Venue.city).all()
-  showsCount = shows.query.count(shows.query.filter(Venue.id == shows.venue_id, shows.start_time >= format_datetime(datetime.today())))
-  data['venues']['num_upcoming_shows'] = showsCount
+  # showsCount = shows.query.count(shows.query.filter(shows.start_time >= format_datetime(datetime.today())))
+  data  = Venue.query.join(shows).with_entities(Venue.city,Venue.state,Venue.id,Venue.name,shows.query.count(shows.query.filter(shows.start_time >= format_datetime(datetime.today()))).label('num_upcoming_shows')).group_by(Venue.city).all()
+
+  # for _ in city:
+  #   data.append(_.asdict())
+
+  # venues['num_upcoming_shows'] = showsCount
   
   return render_template('pages/venues.html', areas=data)
 
@@ -346,8 +353,8 @@ def edit_artist_submission(artist_id):
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
 def edit_venue(venue_id):
   form = VenueForm()
-  venue = Venue.query.filter(Venue.id == venue_id).all()
-
+  venue = Venue.query.filter(Venue.id == venue_id).first()
+  venue = venue._asdict()
   # TODO: populate form with values from venue with ID <venue_id>
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
@@ -425,7 +432,7 @@ def create_artist_submission():
     seeking_venue = request.get_json()['seeking_venue']
     seeking_description = request.get_json()['seeking_description']
 
-    body = Artist(name = name, city = city, state = state, phone = phone, genres = genres, image_link = image_link , website_link = website_link , seeking_venue = seeking_venue, seeking_description = seeking_description)
+    body = Artist(name = name, city = city, state = state, phone = phone, genres = genres, image_link = image_link , website_link = website_link , seeking_venue = seeking_venue, seeking_description = seeking_description, facebook_link = facebook_link)
     db.session.add(body)
     db.session.commit()
     data['name'] = body.name
@@ -468,7 +475,7 @@ def shows():
   data = []
   for _ in result:
     data.append(_.asdict())
-    
+
   # print(data)
   # venueName  = Venue.query.filter(shows.venue_id == Venue.id)
   # artistName  = Artist.query.filter(shows.artist_id == Artist.id)
@@ -505,6 +512,7 @@ def create_show_submission():
   except(error):
     db.session.rollback()
     error= True
+
     print(sys.exc_info)
 
   finally:  

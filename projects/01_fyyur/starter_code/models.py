@@ -23,6 +23,8 @@ class Venue(db.Model):
     seeking_description = db.Column(db.String(500))
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
+    # def __repr__(self) -> str:
+    #     return super().__repr__()
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
